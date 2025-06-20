@@ -246,7 +246,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                       color: Colors.white,
                     ),
                     onPressed: () async {
-                      await viewModelProvider.addExpense(context);
+                      await viewModelProvider.addIncome(context);
                     },
                   ),
                 ),
