@@ -192,6 +192,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                //Add expense
                 SizedBox(
                   height: 40.0,
                   width: 155.0,
@@ -215,10 +216,40 @@ class ExpenseViewMobile extends HookConsumerWidget {
                       color: Colors.white,
                     ),
                     onPressed: () async {
-                      viewModelProvider.addExpense(context);
+                      await viewModelProvider.addExpense(context);
                     },
                   ),
-                )
+                ),
+                SizedBox(
+                  width: 10.0,
+                ),
+                SizedBox(
+                  height: 40.0,
+                  width: 155.0,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      overlayColor: Colors.grey,
+                      backgroundColor: Colors.black,
+                      iconColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusGeometry.circular(10.0),
+                      ),
+                    ),
+                    label: Poppins(
+                      text: "Add Income",
+                      size: 15.0,
+                      color: Colors.white,
+                    ),
+                    icon: Icon(
+                      Icons.add,
+                      size: 15.0,
+                      color: Colors.white,
+                    ),
+                    onPressed: () async {
+                      await viewModelProvider.addExpense(context);
+                    },
+                  ),
+                ),
               ],
             )
           ],

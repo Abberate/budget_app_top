@@ -168,7 +168,7 @@ class LoginViewMobile extends HookConsumerWidget {
                   if (kIsWeb) {
                     await viewModelProvider.signInWithGoogleWeb(context);
                   } else {
-                    await viewModelProvider.signInWithGoogleWebMobile(context);
+                    await viewModelProvider.signInWithGoogleMobile(context);
                   }
                 }),
           ],

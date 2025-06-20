@@ -26,7 +26,7 @@ class Poppins extends StatelessWidget {
   }
 }
 
-DialogueBox(BuildContext context, String title) {
+DialogBox(BuildContext context, String title) {
   return showDialog(
     context: context,
     builder: (BuildContext context) => AlertDialog(
@@ -61,16 +61,17 @@ class TextForm extends StatelessWidget {
   final text;
   final containerWidth;
   final hintText;
-  final controller;
   final digitOnly;
-  final validator;
+  final String? Function(String?)
+      validator; // on peut retirer String? Function(String?)
+  final void Function(String?) save; // on peut retirer void Function(String?)
   const TextForm({
     super.key,
     required this.text,
     required this.containerWidth,
     required this.hintText,
-    required this.controller,
     required this.validator,
+    required this.save,
     this.digitOnly,
   });
 
@@ -87,10 +88,10 @@ class TextForm extends StatelessWidget {
           width: containerWidth,
           child: TextFormField(
             validator: validator,
+            onSaved: save,
             inputFormatters: digitOnly != null
                 ? [FilteringTextInputFormatter.digitsOnly]
                 : [],
-            controller: controller,
             decoration: InputDecoration(
                 errorBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.red),

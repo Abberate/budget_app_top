@@ -11,11 +11,12 @@ final viewModel =
 
 class ViewModel extends ChangeNotifier {
   final _auth = FirebaseAuth.instance;
-  CollectionReference userCollection =
-      FirebaseFirestore.instance.collection("users");
   bool isSignIn = false;
   bool isObscure = true;
   var logger = Logger();
+
+  CollectionReference userCollection =
+      FirebaseFirestore.instance.collection("users");
 
   List expensesName = [];
   List expensesAmount = [];
@@ -52,7 +53,7 @@ class ViewModel extends ChangeNotifier {
         .then((onValue) => logger.d("Registration successfull"))
         .onError((error, strackTrace) {
       logger.d("Registration error $error");
-      DialogueBox(
+      DialogBox(
         context,
         error.toString().replaceAll(RegExp('\\[.*?\\]'), ''),
       );
@@ -66,7 +67,7 @@ class ViewModel extends ChangeNotifier {
         .then((onValue) => logger.d("Login successfull Ok"))
         .onError((error, stackTrace) {
       logger.d("Login error $error");
-      DialogueBox(
+      DialogBox(
         context,
         error.toString().replaceAll(RegExp('\\[.*?\\]'), ''),
       );
@@ -77,19 +78,20 @@ class ViewModel extends ChangeNotifier {
     GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
 
     await _auth.signInWithPopup(googleAuthProvider).onError(
-        (error, stackTrace) => DialogueBox(
+        (error, stackTrace) => DialogBox(
             context, error.toString().replaceAll(RegExp('\\[.*?\\]'), '')));
     logger
         .d("Current user is not empty = ${_auth.currentUser!.uid.isNotEmpty}");
   }
 
-  Future<void> signInWithGoogleWebMobile(BuildContext context) async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn()
-        .signIn()
-        .onError((error, stackTrace) => DialogueBox(
-              context,
-              error.toString().replaceAll(RegExp('\\[.*?\\]'), ''),
-            ));
+  Future<void> signInWithGoogleMobile(BuildContext context) async {
+    final GoogleSignInAccount? googleUser =
+        await GoogleSignIn().signIn().onError(
+              (error, stackTrace) => DialogBox(
+                context,
+                error.toString().replaceAll(RegExp('\\[.*?\\]'), ''),
+              ),
+            );
 
     final GoogleSignInAuthentication? googleAuth =
         await googleUser?.authentication;
@@ -101,7 +103,7 @@ class ViewModel extends ChangeNotifier {
       logger.d("Google Sign in successful");
     }).onError((error, stackTrace) {
       logger.d("Google Sign in error $error");
-      DialogueBox(
+      DialogBox(
         context,
         error.toString().replaceAll(RegExp('\\[.*?\\]'), ''),
       );
@@ -110,8 +112,8 @@ class ViewModel extends ChangeNotifier {
 
   Future addExpense(BuildContext context) async {
     final formKey = GlobalKey<FormState>();
-    TextEditingController controllerName = TextEditingController();
-    TextEditingController controllerAmount = TextEditingController();
+    String nameField = "";
+    String amountField = "";
 
     return await showDialog(
       context: context,
@@ -127,15 +129,19 @@ class ViewModel extends ChangeNotifier {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextForm(
-                  text: "Name",
-                  containerWidth: 130.0,
-                  hintText: "Name",
-                  controller: controllerName,
-                  validator: (value) {
-                    if (value.toString().isEmpty) {
-                      return "Required";
-                    }
-                  }),
+                text: "Name",
+                containerWidth: 130.0,
+                hintText: "Name",
+                validator: (value) {
+                  if (value.toString().isEmpty || value == null) {
+                    return "Required";
+                  }
+                  return null;
+                },
+                save: (value) {
+                  nameField = value!;
+                },
+              ),
               SizedBox(
                 width: 10.0,
               ),
@@ -143,12 +149,15 @@ class ViewModel extends ChangeNotifier {
                 text: "Amount",
                 containerWidth: 100.0,
                 hintText: "Amount",
-                controller: controllerAmount,
                 digitOnly: true,
                 validator: (value) {
-                  if (value.toString().isEmpty) {
+                  if (value.toString().isEmpty || value == null) {
                     return "Required";
                   }
+                  return null;
+                },
+                save: (value) {
+                  amountField = value!;
                 },
               ),
             ],
@@ -156,7 +165,6 @@ class ViewModel extends ChangeNotifier {
         ),
         actions: [
           MaterialButton(
-              child: Poppins(text: "Save", size: 15.0, color: Colors.white),
               splashColor: Colors.grey,
               color: Colors.black,
               shape: RoundedRectangleBorder(
@@ -164,9 +172,99 @@ class ViewModel extends ChangeNotifier {
               ),
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
-                  userCollection.doc();
+                  formKey.currentState!.save();
+                  await userCollection
+                      .doc(_auth.currentUser!.uid)
+                      .collection("expenses")
+                      .add({"name": nameField, "amount": amountField}).onError(
+                          (error, stackTrace) {
+                    logger.d("Error $error");
+                    return DialogBox(context, error.toString());
+                  });
+                  Navigator.pop(context);
                 }
-              })
+              },
+              child: Poppins(text: "Save", size: 15.0, color: Colors.white))
+        ],
+      ),
+    );
+  }
+
+  Future addIncome(BuildContext context) async {
+    final formKey = GlobalKey<FormState>();
+    String nameField = "";
+    String amountField = "";
+
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        actionsAlignment: MainAxisAlignment.center,
+        contentPadding: EdgeInsets.all(32.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(10.0),
+        ),
+        title: Form(
+          key: formKey,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextForm(
+                text: "Name",
+                containerWidth: 130.0,
+                hintText: "Name",
+                validator: (value) {
+                  if (value.toString().isEmpty || value == null) {
+                    return "Required";
+                  }
+                  return null;
+                },
+                save: (value) {
+                  nameField = value!;
+                },
+              ),
+              SizedBox(
+                width: 10.0,
+              ),
+              TextForm(
+                text: "Amount",
+                containerWidth: 100.0,
+                hintText: "Amount",
+                digitOnly: true,
+                validator: (value) {
+                  if (value.toString().isEmpty || value == null) {
+                    return "Required";
+                  }
+                  return null;
+                },
+                save: (value) {
+                  amountField = value!;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          MaterialButton(
+              splashColor: Colors.grey,
+              color: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(10.0),
+              ),
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  formKey.currentState!.save();
+                  await userCollection
+                      .doc(_auth.currentUser!.uid)
+                      .collection("incomes")
+                      .add({"name": nameField, "amount": amountField}).onError(
+                          (error, stackTrace) {
+                    logger.d("Error $error");
+                    return DialogBox(context, error.toString());
+                  });
+                  Navigator.pop(context);
+                }
+              },
+              child: Poppins(text: "Save", size: 15.0, color: Colors.white))
         ],
       ),
     );
