@@ -29,7 +29,7 @@ class ViewModel extends ChangeNotifier {
   }
 
   Future<void> isSignedIn() async {
-    await _auth.authStateChanges().listen((User? user) {
+    _auth.authStateChanges().listen((User? user) {
       if (user == null) {
         isSignIn = false;
       } else {
@@ -176,9 +176,11 @@ class ViewModel extends ChangeNotifier {
                   await userCollection
                       .doc(_auth.currentUser!.uid)
                       .collection("expenses")
-                      .add({"name": nameField, "amount": amountField}).onError(
-                          (error, stackTrace) {
-                    logger.d("Error $error");
+                      .add({"name": nameField, "amount": amountField}).then(
+                          (value) {
+                    logger.d("Expense added");
+                  }).onError((error, stackTrace) {
+                    logger.d("Add Expense Error = $error");
                     return DialogBox(context, error.toString());
                   });
                   Navigator.pop(context);
@@ -256,9 +258,11 @@ class ViewModel extends ChangeNotifier {
                   await userCollection
                       .doc(_auth.currentUser!.uid)
                       .collection("incomes")
-                      .add({"name": nameField, "amount": amountField}).onError(
-                          (error, stackTrace) {
-                    logger.d("Error $error");
+                      .add({"name": nameField, "amount": amountField}).then(
+                          (value) {
+                    logger.d("Income added");
+                  }).onError((error, stackTrace) {
+                    logger.d("Add income Error = $error");
                     return DialogBox(context, error.toString());
                   });
                   Navigator.pop(context);
@@ -267,6 +271,42 @@ class ViewModel extends ChangeNotifier {
               child: Poppins(text: "Save", size: 15.0, color: Colors.white))
         ],
       ),
+    );
+  }
+
+  void expensesStream() {
+    userCollection
+        .doc(_auth.currentUser!.uid)
+        .collection("expenses")
+        .snapshots()
+        .listen(
+      (expensesSnapshot) {
+        expensesName.clear();
+        expensesAmount.clear();
+        for (var expense in expensesSnapshot.docs) {
+          expensesName.add(expense["name"]);
+          expensesAmount.add(expense["amount"]);
+        }
+        notifyListeners();
+      },
+    );
+  }
+
+  void incomesStream() {
+    userCollection
+        .doc(_auth.currentUser!.uid)
+        .collection("incomes")
+        .snapshots()
+        .listen(
+      (incomesSnapshot) {
+        incomesName.clear();
+        incomesAmount.clear();
+        for (var income in incomesSnapshot.docs) {
+          incomesName.add(income["name"]);
+          incomesAmount.add(income["amount"]);
+        }
+        notifyListeners();
+      },
     );
   }
 }
