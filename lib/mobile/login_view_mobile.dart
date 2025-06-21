@@ -44,21 +44,25 @@ class LoginViewMobile extends HookConsumerWidget {
                 decoration: InputDecoration(
                   prefixIcon: Icon(
                     Icons.email,
-                    color: Colors.black,
+                    color: Color(0xFF6C63FF),
                     size: 30.0,
                   ),
                   enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF6C63FF)),
                     borderRadius: BorderRadius.all(
                       Radius.circular(10.0),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF6C63FF)),
                     borderRadius: BorderRadius.all(
                       Radius.circular(10.0),
                     ),
                   ),
                   hintText: 'Email',
-                  hintStyle: GoogleFonts.poppins(),
+                  hintStyle: GoogleFonts.poppins(
+                    color: Color(0xFF6C63FF),
+                  ),
                 ),
               ),
             ),
@@ -73,30 +77,35 @@ class LoginViewMobile extends HookConsumerWidget {
                 obscureText: viewModelProvider.isObscure,
                 obscuringCharacter: "⁕",
                 decoration: InputDecoration(
-                    prefixIcon: IconButton(
-                      onPressed: () {
-                        viewModelProvider.toggleObscure();
-                      },
-                      icon: Icon(
-                        viewModelProvider.isObscure
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                        color: Colors.black,
-                        size: 30.0,
-                      ),
+                  prefixIcon: IconButton(
+                    onPressed: () {
+                      viewModelProvider.toggleObscure();
+                    },
+                    icon: Icon(
+                      viewModelProvider.isObscure
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Color(0xFF6C63FF),
+                      size: 30.0,
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10.0),
-                      ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF6C63FF)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10.0),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10.0),
-                      ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF6C63FF)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10.0),
                     ),
-                    hintText: "Password",
-                    hintStyle: GoogleFonts.poppins()),
+                  ),
+                  hintText: "Password",
+                  hintStyle: GoogleFonts.poppins(
+                    color: Color(0xFF6C63FF),
+                  ),
+                ),
               ),
             ),
             SizedBox(
@@ -115,7 +124,7 @@ class LoginViewMobile extends HookConsumerWidget {
                           context, _emailField.text, _passwordField.text);
                     },
                     splashColor: Colors.grey,
-                    color: Colors.black,
+                    color: Color(0xFF6C63FF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -129,8 +138,8 @@ class LoginViewMobile extends HookConsumerWidget {
                 SizedBox(width: 20.0),
                 Text(
                   "Or",
-                  style:
-                      GoogleFonts.poppins(color: Colors.black, fontSize: 15.0),
+                  style: GoogleFonts.poppins(
+                      color: Color(0xFF6C63FF), fontSize: 15.0),
                 ),
                 SizedBox(width: 20.0),
                 //Login button
@@ -143,7 +152,7 @@ class LoginViewMobile extends HookConsumerWidget {
                           context, _emailField.text, _passwordField.text);
                     },
                     splashColor: Colors.grey,
-                    color: Colors.black,
+                    color: Color(0xFF6C63FF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -161,7 +170,7 @@ class LoginViewMobile extends HookConsumerWidget {
             ),
             SignInButton(
                 buttonType: ButtonType.google,
-                btnColor: Colors.black,
+                btnColor: Color(0xFF6C63FF),
                 btnTextColor: Colors.white,
                 buttonSize: ButtonSize.medium,
                 onPressed: () async {

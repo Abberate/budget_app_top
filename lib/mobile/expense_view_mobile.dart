@@ -1,12 +1,11 @@
 import 'package:budget_app/components.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../view_model.dart';
-
-bool isLoading = true;
 
 class ExpenseViewMobile extends HookConsumerWidget {
   const ExpenseViewMobile({super.key});
@@ -16,21 +15,22 @@ class ExpenseViewMobile extends HookConsumerWidget {
     final viewModelProvider = ref.watch(viewModel);
     double deviceWidth = MediaQuery.of(context).size.width;
 
-    if (isLoading == true) {
+    useEffect(() {
       viewModelProvider.expensesStream();
       viewModelProvider.incomesStream();
-      isLoading = false;
-    }
+      return null;
+    }, []);
 
     int totalExpense = 0;
     int totalIncome = 0;
+
     void calculate() {
       for (int i = 0; i < viewModelProvider.expensesName.length; i++) {
         totalExpense += int.parse(viewModelProvider.expensesAmount[i]);
       }
 
       for (int i = 0; i < viewModelProvider.incomesName.length; i++) {
-        totalExpense += int.parse(viewModelProvider.incomesAmount[i]);
+        totalIncome += int.parse(viewModelProvider.incomesAmount[i]);
       }
     }
 
@@ -48,7 +48,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.black, width: 1.0),
+                    border: Border.all(color: Color(0xFF6C63FF), width: 1.0),
                   ),
                   child: CircleAvatar(
                     radius: 180.0,
@@ -68,7 +68,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                 onPressed: () async {
                   await viewModelProvider.logout();
                 },
-                color: Colors.black,
+                color: Color(0xFF6C63FF),
                 height: 50.0,
                 minWidth: 200.0,
                 shape: RoundedRectangleBorder(
@@ -92,7 +92,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                     icon: SvgPicture.asset(
                       'assets/instagram.svg',
                       width: 35.0,
-                      color: Colors.black,
+                      color: Color(0xFF6C63FF),
                     ),
                   ),
                   IconButton(
@@ -102,7 +102,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                     icon: SvgPicture.asset(
                       'assets/twitter.svg',
                       width: 35.0,
-                      color: Colors.black,
+                      color: Color(0xFF6C63FF),
                     ),
                   ),
                 ],
@@ -111,7 +111,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
           ),
         ),
         appBar: AppBar(
-          backgroundColor: Colors.black,
+          backgroundColor: Color(0xFF6C63FF),
           iconTheme: IconThemeData(color: Colors.white, size: 30.0),
           centerTitle: true,
           title: Poppins(
@@ -122,7 +122,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
           actions: [
             IconButton(
               onPressed: () async {
-                ///Todo Reset function
+                viewModelProvider.reset();
               },
               icon: Icon(Icons.refresh),
             )
@@ -138,7 +138,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                   width: deviceWidth / 1.5,
                   padding: EdgeInsets.all(15.0),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: Color(0xFF6C63FF),
                     borderRadius: BorderRadius.all(
                       Radius.circular(25.0),
                     ),
@@ -167,7 +167,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                       RotatedBox(
                         quarterTurns: 1,
                         child: Divider(
-                          color: Colors.grey,
+                          color: Colors.white,
                           indent: 40.0,
                           endIndent: 40.0,
                         ),
@@ -208,7 +208,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       overlayColor: Colors.grey,
-                      backgroundColor: Colors.black,
+                      backgroundColor: Color(0xFF6C63FF),
                       iconColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadiusGeometry.circular(10.0),
@@ -238,7 +238,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       overlayColor: Colors.grey,
-                      backgroundColor: Colors.black,
+                      backgroundColor: Color(0xFF6C63FF),
                       iconColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadiusGeometry.circular(10.0),
@@ -272,7 +272,14 @@ class ExpenseViewMobile extends HookConsumerWidget {
                   //Expenses List
                   Column(
                     children: [
-                      Poppins(text: "Expenses", size: 15.0),
+                      Poppins(
+                          text: "Expenses",
+                          size: 15.0,
+                          color: Color(0xFF6C63FF),
+                          fontWeight: FontWeight.bold),
+                      SizedBox(
+                        height: 5.0,
+                      ),
                       Container(
                         padding: EdgeInsets.all(7.0),
                         height: 210.0,
@@ -281,7 +288,8 @@ class ExpenseViewMobile extends HookConsumerWidget {
                           borderRadius: BorderRadius.all(
                             Radius.circular(15.0),
                           ),
-                          border: Border.all(width: 1.0, color: Colors.black),
+                          border:
+                              Border.all(width: 1.0, color: Color(0xFF6C63FF)),
                         ),
                         child: ListView.builder(
                             itemCount: viewModelProvider.expensesAmount.length,
@@ -291,15 +299,18 @@ class ExpenseViewMobile extends HookConsumerWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Poppins(
-                                      text:
-                                          viewModelProvider.expensesName[index],
-                                      size: 14.0),
+                                    text: viewModelProvider.expensesName[index],
+                                    size: 15.0,
+                                    color: Color(0xFF6C63FF),
+                                  ),
                                   Align(
                                     alignment: Alignment.centerRight,
                                     child: Poppins(
-                                        text: viewModelProvider
-                                            .expensesAmount[index],
-                                        size: 14.0),
+                                      text: viewModelProvider
+                                          .expensesAmount[index],
+                                      size: 15.0,
+                                      color: Color(0xFF6C63FF),
+                                    ),
                                   )
                                 ],
                               );
@@ -310,7 +321,15 @@ class ExpenseViewMobile extends HookConsumerWidget {
                   //Incomes List
                   Column(
                     children: [
-                      Poppins(text: "Incomes", size: 15.0),
+                      Poppins(
+                        text: "Incomes",
+                        size: 15.0,
+                        color: Color(0xFF6C63FF),
+                        fontWeight: FontWeight.bold,
+                      ),
+                      SizedBox(
+                        height: 5.0,
+                      ),
                       Container(
                         padding: EdgeInsets.all(7.0),
                         height: 210.0,
@@ -319,7 +338,8 @@ class ExpenseViewMobile extends HookConsumerWidget {
                           borderRadius: BorderRadius.all(
                             Radius.circular(15.0),
                           ),
-                          border: Border.all(width: 1.0, color: Colors.black),
+                          border:
+                              Border.all(width: 1.0, color: Color(0xFF6C63FF)),
                         ),
                         child: ListView.builder(
                             itemCount: viewModelProvider.incomesAmount.length,
@@ -329,15 +349,18 @@ class ExpenseViewMobile extends HookConsumerWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Poppins(
-                                      text:
-                                          viewModelProvider.incomesName[index],
-                                      size: 14.0),
+                                    text: viewModelProvider.incomesName[index],
+                                    size: 15.0,
+                                    color: Color(0xFF6C63FF),
+                                  ),
                                   Align(
                                     alignment: Alignment.centerRight,
                                     child: Poppins(
-                                        text: viewModelProvider
-                                            .incomesAmount[index],
-                                        size: 14.0),
+                                      text: viewModelProvider
+                                          .incomesAmount[index],
+                                      size: 15.0,
+                                      color: Color(0xFF6C63FF),
+                                    ),
                                   )
                                 ],
                               );

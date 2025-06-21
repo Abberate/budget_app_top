@@ -35,14 +35,14 @@ class ViewModel extends ChangeNotifier {
       } else {
         isSignIn = true;
       }
+      notifyListeners();
     });
-
-    notifyListeners();
   }
 
   //logout function
   Future<void> logout() async {
     await _auth.signOut();
+    notifyListeners();
   }
 
   //Authentication
@@ -308,5 +308,27 @@ class ViewModel extends ChangeNotifier {
         notifyListeners();
       },
     );
+  }
+
+  Future<void> reset() async {
+    await userCollection
+        .doc(_auth.currentUser!.uid)
+        .collection("expenses")
+        .get()
+        .then((snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+
+    await userCollection
+        .doc(_auth.currentUser!.uid)
+        .collection("incomes")
+        .get()
+        .then((snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
   }
 }
