@@ -1,4 +1,5 @@
 import 'package:budget_app/components.dart';
+import 'package:budget_app/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,34 +10,44 @@ import 'package:logger/logger.dart';
 final viewModel =
     ChangeNotifierProvider.autoDispose<ViewModel>((ref) => ViewModel());
 
+final authStateProvider = StreamProvider<User?>((ref) => ref
+    .read(viewModel)
+    .authStateChange); // Provider d'authentification changement d'etat de connexion user
+
 class ViewModel extends ChangeNotifier {
   final _auth = FirebaseAuth.instance;
-  bool isSignIn = false;
-  bool isObscure = true;
-  var logger = Logger();
+  Stream<User?> get authStateChange =>
+      _auth.authStateChanges(); //authentification
 
   CollectionReference userCollection =
       FirebaseFirestore.instance.collection("users");
 
-  List expensesName = [];
-  List expensesAmount = [];
-  List incomesName = [];
-  List incomesAmount = [];
+  bool isObscure = true;
+  var logger = Logger();
+
+  List<Models> expenses = [];
+  List<Models> incomes = [];
+
+  int totalExpense = 0;
+  int totalIncome = 0;
+  int budgetLeft = 0;
+
+  void calculate() {
+    totalExpense = 0;
+    totalIncome = 0;
+    for (int i = 0; i < expenses.length; i++) {
+      totalExpense += int.parse(expenses[i].amount);
+    }
+    for (int i = 0; i < incomes.length; i++) {
+      totalIncome += int.parse(incomes[i].amount);
+    }
+    budgetLeft = totalIncome - totalExpense;
+    notifyListeners();
+  }
 
   toggleObscure() {
     isObscure = !isObscure;
     notifyListeners();
-  }
-
-  Future<void> isSignedIn() async {
-    _auth.authStateChanges().listen((User? user) {
-      if (user == null) {
-        isSignIn = false;
-      } else {
-        isSignIn = true;
-      }
-      notifyListeners();
-    });
   }
 
   //logout function
@@ -281,13 +292,15 @@ class ViewModel extends ChangeNotifier {
         .snapshots()
         .listen(
       (expensesSnapshot) {
-        expensesName.clear();
-        expensesAmount.clear();
+        expenses.clear();
         for (var expense in expensesSnapshot.docs) {
-          expensesName.add(expense["name"]);
-          expensesAmount.add(expense["amount"]);
+          expenses.add(Models.fromJson(expense.data()));
         }
+        // expensesSnapshot.docs.forEach((expense) {
+        //   expenses.add(Models.fromJson(expense.data()));
+        // });
         notifyListeners();
+        calculate();
       },
     );
   }
@@ -299,13 +312,15 @@ class ViewModel extends ChangeNotifier {
         .snapshots()
         .listen(
       (incomesSnapshot) {
-        incomesName.clear();
-        incomesAmount.clear();
+        incomes.clear();
         for (var income in incomesSnapshot.docs) {
-          incomesName.add(income["name"]);
-          incomesAmount.add(income["amount"]);
+          incomes.add(Models.fromJson(income.data()));
         }
+        // incomesSnapshot.docs.forEach((income) {
+        //   incomes.add(Models.fromJson(income.data()));
+        // });
         notifyListeners();
+        calculate();
       },
     );
   }
@@ -332,3 +347,16 @@ class ViewModel extends ChangeNotifier {
     });
   }
 }
+
+// bool isSignIn = false;
+
+// Future<void> isSignedIn() async {
+//   _auth.authStateChanges().listen((User? user) {
+//     if (user == null) {
+//       isSignIn = false;
+//     } else {
+//       isSignIn = true;
+//     }
+//     notifyListeners();
+//   });
+// }
