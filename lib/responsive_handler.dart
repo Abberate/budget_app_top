@@ -12,18 +12,27 @@ class ResponsiveHandler extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModelProvider = ref.watch(viewModel);
-    viewModelProvider.isSignedIn();
+    final _authState = ref.watch(authStateProvider);
 
-    if (viewModelProvider.isSignIn) {
-      return LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth > 600) {
-          return ExpenseViewWeb();
-        } else {
-          return ExpenseViewMobile();
-        }
-      });
-    } else {
+    return _authState.when(data: (data) {
+      if (data != null) {
+        return LayoutBuilder(builder: (context, constraints) {
+          if (constraints.maxWidth > 600) {
+            return ExpenseViewWeb();
+          } else {
+            return ExpenseViewMobile();
+          }
+        });
+      } else {
+        return LayoutBuilder(builder: (context, constraints) {
+          if (constraints.maxWidth > 600) {
+            return LoginViewWeb();
+          } else {
+            return LoginViewMobile();
+          }
+        });
+      }
+    }, error: (e, trace) {
       return LayoutBuilder(builder: (context, constraints) {
         if (constraints.maxWidth > 600) {
           return LoginViewWeb();
@@ -31,6 +40,14 @@ class ResponsiveHandler extends HookConsumerWidget {
           return LoginViewMobile();
         }
       });
-    }
+    }, loading: () {
+      return LayoutBuilder(builder: (context, constraints) {
+        if (constraints.maxWidth > 600) {
+          return LoginViewWeb();
+        } else {
+          return LoginViewMobile();
+        }
+      });
+    });
   }
 }
